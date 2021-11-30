@@ -1,0 +1,16 @@
+---
+title: "Trabajo 2"
+author: "Ana Solís García"
+date: "30/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Trabajo 2
+
+# Elegir un libro para comprar
+
