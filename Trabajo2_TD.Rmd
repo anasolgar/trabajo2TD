@@ -1,16 +1,571 @@
 ---
-title: "Trabajo 2"
+title: "Trabajo 2. Decisión multicriterio"
 author: "Ana Solís García"
 date: "30/11/2021"
-output: html_document
+output: 
+  html_document:
+    code_folding: show
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+source("teoriadecision_funciones_incertidumbre.R")
+source("teoriadecision_funciones_multicriterio.R")
+source("teoriadecision_funciones_multicriterio_diagram.R")
+source("teoriadecision_funciones_multicriterio_utiles.R")
+```
 
 # Trabajo 2
 
 # Elegir un libro para comprar
 
+Leer un buen libro siempre es una forma de ampliar conocimientos, ya sea
+a nivel cultural, científico, o incluso a nivel de conocerse a uno
+mismo.
+
+Para que un libro llegue a ser el adecuado para nosotros o para la
+persona a la que se lo vayamos a comprar, debemos tener en cuenta una
+serie de criterios y por supuesto las preferencias que tenemos sobre de
+cada uno.
+
+En este caso queremos resolver el problema de decidir qué libro es mejor
+de los 5 que hemos escogido, en función de una serie de criterios. Estos
+libros han sido adaptados a películas y todos han sido bastante famosos,
+algunos de ellos han llegado a formar parte de trilogías.
+
+Los criterios a utilizar serán el coste del libro (C1), el género al que
+pertenece (C2),la distancia a la librería más cercana en la que hay ese
+libro (C3), los premios que ha obtenido la película adaptada (C4) y la
+puntuación que ha obtenido el libro.
+
+Las opciones que tenemos son:
+
+Bajo la misma estrella, John Green,2012 literatura juvenil-novela
+(rosa)-romantica 9,45 3 premios
+
+Los juegos del hambre, Suzanne Collins, 2008 Pelicula - 6 premios 9,45
+ciencia ficcion- literatura juvenil
+
+Yo antes de ti, Jojo Moyes, 2012 pelicula - 1premio romantica 10,40
+
+Divergente, Novela de Veronica Roth,2011 4 premios 10,40 ciencia
+ficcion-juvenil
+
+El corredor del laberinto, James Dashner, 2009 6 premios ciencia
+ficcion-juvenil 16,15
+
+Tenemos entonces la siguiente matriz de decisión:
+
+$$\,\,\, \begin{array}{|c|c|c|} 
+ \hline
+    & C_1 & C_2 & C_3 & C_4 & C_5 \\ \hline
+ A_1 & 9,3 & 0 & 1000 &3 & 7,60\\ \hline
+ A_2 & 9,45 & 1 & 500  &6 &8,10 \\ \hline
+ A_3 & 10,4 & 0 &750 & 1 & 8,40\\ \hline
+ A_4 & 10,4 & 1 &1200 & 4 & 7,60\\ \hline
+ A_5 & 16,15 & 1&750 & 6 & 8,30\\ \hline
+\end{array} \quad \quad$$
+
+Metemos los datos de la matriz de decisión.
+
+Como los costes y la distancia a las librerías los queremos minimizar
+los cambiamos de signo.
+
+```{r}
+#n.alt =  c("A1","A2","A3","A4","A5")
+n.alt =  c("Bajo la misma estrella","Los juegos del hambre","Yo antes de ti","Divergente","El corredor del laberinto")
+n.crit = c("C1","C2","C3","C4","C5")
+mDecision=multicriterio.crea.matrizdecision(vector_matporfilas = c(-9.3,0,-1000,3,7.6,
+                                                                   -9.45,1,-500,6,8.1,
+                                                                   -10.4,0,-750,1,8.4,
+                                                                   -10.4,1,-1200,4,7.3,
+                                                                   -16.15,1,-750,6,8.3),numalternativas = 5,numcriterios = 5,v.nombresalt =n.alt,v.nombrescri = n.crit)
+#mDecision
+kable_styling(kable(mDecision,digits=2, align = "lccccc"))
+```
+
+Como vemos los criterios no están en las mismas escalas, luego vamos a
+tener que homogeneizar las columnas. Vamos a hacerlo mediante los dos
+métodos que hemos estudiado:
+
+-   Método Nadir:
+
+```{r}
+mDHom=multicriterio.homogeneizacion.nadir(mDecision)
+kable_styling(kable(mDHom,digits=2, align = "lccccc"))
+```
+
+-   Método Promethee:
+
+```{r}
+# mDHom2=multicriterio.homogeneizacion.promethee(Xmatrizdecision = mDecision, v.delta.min = )
+```
+
+# Método AHP
+
+Las matrices de comparación por pares de este problema han sido
+estimadas de la manera siguiente:
+
+-   Matriz de criterios:
+
+$$
+\,\,\, \begin{array}{|c|c|c|} 
+ \hline
+    & C_1 & C_2 & C_3 & C_4 & C_5 \\ \hline
+ C_1 & 1 & 1/3 & 1 & 1/6 & 1/7 \\ \hline
+ C_2 &  & 1 & 3  &1/4 &1/5 \\ \hline
+ C_3 &  & &1 & 1/6 & 1/7\\ \hline
+ C_4 &  &  & & 1 & 1/2\\ \hline
+ C_5 & & & & & 1\\ \hline
+\end{array} \quad \quad
+$$
+
+-   Matrices Alternativas/Criterios:
+
+    -   Coste
+
+        $$\,\,\, \begin{array}{|c|c|c|} 
+         \hline
+          Criterio\ 1  & A_1 & A_2 & A_3 & A_4 & A_5 \\ \hline
+         A_1 & 1 & 1 & 4& 4 & 9 \\ \hline
+         A_2 &  & 1 & 4  &4 & 9 \\ \hline
+         A_3 &  & &1 &  1 & 5\\ \hline
+         A_4 &  &  & & 1 & 5\\ \hline
+         A_5 & & & & & 1\\ \hline
+        \end{array} \quad \quad$$
+
+    -   Género:
+
+    $$\,\,\, \begin{array}{|c|c|c|} 
+     \hline
+      Criterio\ 2  & A_1 & A_2 & A_3 & A_4 & A_5 \\ \hline
+     A_1 & 1 & 1/5 & 1& 1/5 & 1/5 \\ \hline
+     A_2 &  & 1 & 5  &1 & 1 \\ \hline
+     A_3 &  & &1 &  1/5 & 1/5\\ \hline
+     A_4 &  &  & & 1 & 1\\ \hline
+     A_5 & & & & & 1\\ \hline
+    \end{array} \quad \quad$$
+
+    -   Distancia:
+
+    $$\,\,\, \begin{array}{|c|c|c|} 
+     \hline
+      Criterio\ 3  & A_1 & A_2 & A_3 & A_4 & A_5 \\ \hline
+     A_1 & 1 & 1/7 & 1/5 & 2 & 1/5 \\ \hline
+     A_2 &  & 1 & 2  & 9 & 2 \\ \hline
+     A_3 &  & &1 &  8 & 1\\ \hline
+     A_4 &  &  & & 1 & 1/8\\ \hline
+     A_5 & & & & & 1\\ \hline
+    \end{array} \quad \quad$$
+
+    -   Premios:
+
+        $$\,\,\, \begin{array}{|c|c|c|} 
+         \hline
+          Criterio\ 4  & A_1 & A_2 & A_3 & A_4 & A_5 \\ \hline
+         A_1 & 1 & 1/7 & 3 & 1/2 & 1/7 \\ \hline
+         A_2 &  & 1 & 9 & 5 & 1 \\ \hline
+         A_3 &  & &1 &  1/3 & 1/9\\ \hline
+         A_4 &  &  & & 1 & 1/5\\ \hline
+         A_5 & & & & & 1\\ \hline
+        \end{array} \quad \quad$$
+
+    -   Puntuación:
+
+        $$\,\,\, \begin{array}{|c|c|c|} 
+         \hline
+          Criterio\ 5  & A_1 & A_2 & A_3 & A_4 & A_5 \\ \hline
+         A_1 & 1 & 1/5 & 1/7 & 2& 1/6  \\ \hline
+         A_2 &  & 1 & 1/3 & 6 & 1/2 \\ \hline
+         A_3 &  & &1 &  19 & 2\\ \hline
+         A_4 &  &  & & 1 & 1/8\\ \hline
+         A_5 & & & & & 1\\ \hline
+        \end{array} \quad \quad$$
+
+## 1.Datos
+
+```{r}
+mCrit=multicriterio.crea.matrizvaloraciones_mej(vector_valoraciones_diagsup = c(1/3,1,1/6,1/7,3,1/4,1/5,1/6,1/7,1/2),numalternativas = 5,v.nombres.alternativas = n.crit)
+library(knitr)
+round(mCrit, 2)
+```
+
+-   Criterio 1
+
+```{r}
+maltC1=multicriterio.crea.matrizvaloraciones_mej(vector_valoraciones_diagsup = c(1,4,4,9,4,4,9,1,5,5),numalternativas = 5,v.nombres.alternativas = n.alt)
+round(maltC1,digits=2)
+```
+
+-   Criterio 2
+
+```{r}
+maltC2=multicriterio.crea.matrizvaloraciones_mej(vector_valoraciones_diagsup = c(1/5,1,1/5,1/5,5,1,1,1/5,1/5,1),numalternativas = 5,v.nombres.alternativas = n.alt)
+round(maltC2,digits=2)
+```
+
+-   Criterio 3
+
+```{r}
+maltC3=multicriterio.crea.matrizvaloraciones_mej(vector_valoraciones_diagsup = c(1/7,1/5,2,1/5,2,9,2,8,1,1/8),numalternativas = 5,v.nombres.alternativas = n.alt)
+round(maltC3,digits=2)
+```
+
+-   Criterio 4
+
+```{r}
+maltC4=multicriterio.crea.matrizvaloraciones_mej(vector_valoraciones_diagsup = c(1/7,3,1/2,1/7,9,5,1,1/3,1/9,1/5),numalternativas = 5,v.nombres.alternativas = n.alt)
+round(maltC4,digits=2)
+```
+
+-   Criterio 5
+
+```{r}
+maltC5=multicriterio.crea.matrizvaloraciones_mej(vector_valoraciones_diagsup = c(1/5,1/7,2,1/6,1/3,6,1/2,9,2,1/8),numalternativas = 5,v.nombres.alternativas = n.alt)
+library(dplyr)
+kable(maltC5, align = "c",digits = 2)
+```
+
+## 2.Diagrama de jerarquías
+
+```{r}
+num.alt=5
+num.crit=5
+Xmatriznivel = array(NA,dim=c(num.alt,num.alt,num.crit))
+Xmatriznivel[,,1] = maltC1
+Xmatriznivel[,,2] = maltC2
+Xmatriznivel[,,3] = maltC3
+Xmatriznivel[,,4] = maltC4
+Xmatriznivel[,,5] = maltC5
+dimnames(Xmatriznivel)[[1]] = n.alt
+dimnames(Xmatriznivel)[[2]] = n.alt
+dimnames(Xmatriznivel)[[3]] = n.crit
+diag = multicriterio.metodoahp.diagrama(mCrit, 
+                                 Xmatriznivel)
+```
+
+## 3.Pesos locales
+
+```{r}
+(ploc=multicriterio.metodoAHP.variante1.autovectormayorautovalor(mCrit))
+```
+
+Los pesos locales para cada criterio son:
+
+**C1**: 0.05065668
+
+**C2**: 0.11567610
+
+**C3**: 0.05065668
+
+**C4**: 0.31659615
+
+**C5**: 0.46641438
+
+## 4.Pesos locales para cada alternativa
+
+```{r}
+(plocC1=multicriterio.metodoAHP.variante1.autovectormayorautovalor(maltC1))
+```
+
+Los pesos locales para cada alternativa en el criterio 1 son:
+
+**A1**: 0.37422226
+
+**A2**: 0.37422226
+
+**A3**: 0.11026950
+
+**A4**: 0.11026950
+
+**A5**: 0.03101648
+
+```{r}
+(plocC2=multicriterio.metodoAHP.variante1.autovectormayorautovalor(maltC2))
+```
+
+Los pesos locales para cada alternativa en el criterio 2 son:
+
+**A1**: 0.05882353
+
+**A2**: 0.29411765
+
+**A3**: 0.05882353
+
+**A4**: 0.29411765
+
+**A5**: 0.29411765
+
+```{r}
+(plocC3=multicriterio.metodoAHP.variante1.autovectormayorautovalor(maltC3))
+```
+
+Los pesos locales para cada alternativa en el criterio 3 son:
+
+**A1**: 0.05570545
+
+**A2**: 0.41553954
+
+**A3**: 0.24759213
+
+**A4**: 0.03357075
+
+**A5**: 0.24759213
+
+```{r}
+(plocC4=multicriterio.metodoAHP.variante1.autovectormayorautovalor(maltC4))
+```
+
+Los pesos locales para cada alternativa en el criterio 3 son:
+
+**A1**: 0.06506848
+
+**A2**: 0.40195289
+
+**A3**: 0.03481724
+
+**A4**: 0.09620849
+
+**A5**: 0.40195289
+
+```{r}
+(plocC5=multicriterio.metodoAHP.variante1.autovectormayorautovalor(maltC5))
+```
+
+Los pesos locales para cada alternativa en el criterio 3 son:
+
+**A1**: 0.05272640
+
+**A2**: 0.18508363
+
+**A3**: 0.44009346
+
+**A4**: 0.03453483
+
+**A5**: 0.28756168
+
+Podemos comprobar que la consistencia es aceptable para todos los casos,
+pues todos los coeficientes de inconsistencia son menores que 0.1.
+
+```{r}
+rbind(ploc$RI.coef.inconsistencia,
+      plocC1$RI.coef.inconsistencia,plocC2$RI.coef.inconsistencia,
+      plocC3$RI.coef.inconsistencia,plocC4$RI.coef.inconsistencia,
+      plocC5$RI.coef.inconsistencia)
+```
+
+## 5.Prioridad global de cada libro
+
+```{r}
+pesosTabla = multicriterio.metodoAHP.pesosglobales_entabla(ploc$valoraciones.ahp,
+                                                           rbind(plocC1$valoraciones.ahp,
+                                                                 plocC2$valoraciones.ahp,
+                                                                 plocC3$valoraciones.ahp,
+                                                                 plocC4$valoraciones.ahp,
+                                                                 plocC5$valoraciones.ahp))
+knitr::kable(pesosTabla,digits = 3)
+pesosTabla
+```
+
+**A1**: 0.07377597
+
+**A2**: 0.28761150
+
+**A3**: 0.24122149
+
+**A4**: 0.08787563
+
+**A5**: 0.30951541
+
+```{r}
+vect.pesos.criterios=pesosTabla[4,1:3]
+vect.pesos.alt_crit=pesosTabla[1:3,1:3]
+mPondramasb=vect.pesos.alt_crit*matrix(vect.pesos.criterios,ncol=3,nrow = 3,byrow = T)
+mPondramas=pesosTabla
+mPondramas[1:3,1:3]=mPondramasb
+mPondramas[4,4]=1
+#mPondramas
+knitr::kable(mPondramas)
+```
+
+Los pesos globales para cada criterio serían:
+
+**C1**: 0.0506567
+
+**C2:** 0.1156761
+
+**C3**: 0.0506567
+
+**C4**: 0.3165962
+
+**C5**: 0.4664144
+
+### Librería AHP
+
+Vamos a realizar el método ahp también utilizando la librería `ahp`
+
+```{r}
+library(ahp)
+libros=Load("libros.ahp")
+libros
+```
+
+```{r}
+Calculate(libros)
+#Visualize(libros)
+Visualize_mej = function(modeloahp) {
+sink("temp.txt")
+s1 = Visualize(modeloahp)
+sink()
+unlink("temp.txt")
+s1
+}
+Visualize_mej(libros)
+
+```
+
+Pesos locales
+
+```{r}
+#ahp::RunGUI()
+```
+
+Pesos locales de los criterios y de cada alternativa en cada criterio:
+
+```{r}
+AnalyzeTable(libros, sort="orig", variable="priority")
+```
+
+Prioridad global de cada libro:
+
+```{r}
+AnalyzeTable(libros,sort = "orig")
+```
+
+# Método Electre
+
+Vamos a coger los pesos calculados en el AHP
+
+```{r}
+pesos = ploc$valoraciones.ahp
+mElectre=multicriterio.metodoELECTRE_I(tabdecs.X = mDHom,pesos.criterios = pesos,nivel.concordancia.minimo.alpha = 0.7,no.se.compensan =c(1,Inf, Inf,2,1) , que.alternativas = TRUE)
+mElectre
+```
+
+Para la primera iteración hemos obtenido como núcleo:
+
+```{r}
+mElectre$nucleo_aprox
+```
+
+```{r}
+qgraph::qgraph(mElectre$relacion.dominante)
+```
+
+En la siguiente iteración vamos a restringir las alternativas a las del
+núcleo obtenido:
+
+```{r}
+mElectre1=multicriterio.metodoELECTRE_I(tabdecs.X = mDHom,pesos.criterios = pesos, nivel.concordancia.minimo.alpha = 0.7,no.se.compensan = c(1,Inf,Inf,2,1),que.alternativas = c(3,5))
+mElectre1
+```
+
+Seguimos con el mismo núcleo
+
+```{r}
+mElectre1$nucleo_aprox
+```
+
+```{r}
+qgraph::qgraph(mElectre1$relacion.dominante)
+```
+
+Vamos a bajar ahora el nivel de alfa a 0.55:
+
+```{r}
+mElectre2=multicriterio.metodoELECTRE_I(tabdecs.X = mDHom, pesos.criterios = pesos, nivel.concordancia.minimo.alpha = 0.55,no.se.compensan = c(1,Inf,Inf,2,1),c(3,5))
+mElectre2
+```
+
+```{r}
+qgraph::qgraph(mElectre2$relacion.dominante)
+```
+
+Luego nos quedaríamos con la alternativa 3 : *Yo antes de ti*
+
+# Método Promethee
+
+Vamos a utilizar las siguientes funciones de preferencia para cada
+criterio:
+
+-   Coste: *cuasi-criterio* con $q_i$ = 1
+
+-   Género: *criterio usual*
+
+-   Distancia: *criterio nivel* con $q_i$ = 200 y $p_i$ = 300
+
+-   Premios: *criterio con preferencia lineal y área de indiferencia*
+    con $q_i$ = 1 y $p_i$ = 3
+
+-   Puntuación: *criterio gaussiano* con $s_i$ = 0.7
+
+```{r}
+tab.fpref = matrix (c(2,1,0,0,
+                      1,0,0,0,
+                      4,200,300,0,
+                      5,1,3,0,
+                      6,0,0,0.7), ncol = 4, byrow = T)
+tab.fpref
+```
+
+## Promethee I
+
+```{r}
+mPrometheeI= multicriterio.metodo.promethee_i(tabdecs.X = mDHom,pesos.criterios = pesos, tab.fpref = tab.fpref)
+mPrometheeI
+```
+
+```{r}
+qgraph::qgraph(mPrometheeI$tablarelacionsupera)
+```
+
+## Promethee II
+
+```{r}
+mPrometheeII= multicriterio.metodo.promethee_ii(tabdecs.X = mDHom,pesos.criterios = pesos, tab.fpref = tab.fpref)
+mPrometheeII
+```
+
+```{r}
+qgraph::qgraph(mPrometheeII$tablarelacionsupera)
+```
+
+Ordenando los flujos netos:
+
+```{r}
+order(mPrometheeII$vflujos.netos, decreasing = T)
+```
+
+En este caso la mejor alternativa es la 5, *El corredor del laberinto*
+
+# Método ArrowRaimond (metodo axiomático)
+
+```{r}
+mArrow = multicriterio.metodoaxiomatico.ArrowRaymond(mDHom)
+mArrow
+```
+
+Las alternativas ordenadas de mejor a peor:
+
+```{r}
+mArrow$alternativasordenadas
+```
+
+Para este método la mejor alternativa sería la 2: *Los juegos del
+hambre*
